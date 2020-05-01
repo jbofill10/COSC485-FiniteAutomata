@@ -1,19 +1,15 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import process from 'process';
+import fs from 'fs'
+import { Diagram } from "./components/index";
 
-class App extends React.Component{
-    onComponentDidMount(){
-
-    }
-
-    render(){
+function App() {
         return(
-            <div>{String(process.env.file1)}
+            <div>
+                <Diagram/>
             </div>
         )
     }
-}
 
-
-ReactDOM.render(<App></App>, document.getElementById('root'));
+ReactDOM.render(<App/>, document.getElementById('root'));
