@@ -1,6 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Diagram } from "./components/index";
+import {Diagram } from './components/index'
 
 function App() {
         return(

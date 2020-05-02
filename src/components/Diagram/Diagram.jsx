@@ -1,5 +1,5 @@
 import React from 'react';
-import {DFA, NFA} from './index'
+import {DFA, NFA} from '../index'
 import fs from "fs";
 import 'dotenv/config'
 
