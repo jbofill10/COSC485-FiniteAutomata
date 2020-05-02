@@ -1,29 +1,39 @@
 import React from 'react';
-import {DFA, NFA} from "./index";
-import fs from 'fs';
+import {DFA, NFA} from './index'
+import fs from "fs";
+import 'dotenv/config'
 
 export default class Diagram extends React.Component{
-    constructor(props: any){
+    constructor(props){
         super(props);
         this.state={
-            definition: null,
+            states: null,
+            alphabet: null,
+            startingState: null,
+            finalStates: null,
+            transitionFunctions: null,
             strings: null
         };
     }
 
     componentDidMount(){
-        this.readFiles(String(process.env.file1), "placefiller");
+        console.log(process.env.REACT_APP_file1)
+        this.readFiles(String(process.env.REACT_APP_file1).trim() || "", 'utf8', "placefiller");
+        
     }
 
     render(){
         return(
-            <DFA/>
+            <DFA states={this.state.states} alphabet={this.state.alphabet} startingState={this.state.startingState} 
+                finalStates={this.state.finalStates} transitionFunctions={this.state.transitionFunctions} strings={this.state.strings}
+            />
         );
     }
 
-    readFiles = (definitionPath: string, stringsPath: string) => {
+    readFiles = (definitionPath, stringsPath) => {
         // Reading Automata Definition file:
-        var definitionParsed: {[key: string]: any} = {};
+        console.log(definitionPath)
+        var definitionParsed = {};
         var defText = fs.readFileSync(definitionPath).toString("utf-8");
 
         var defSplit = defText.split("\n");
@@ -46,14 +56,22 @@ export default class Diagram extends React.Component{
             definitionParsed[parsedResults[0]] = parsedResults[1];
         }
 
-        console.log(definitionParsed);
+        console.log(definitionParsed)
+        
+        this.setState({
+            states: definitionParsed['States'],
+            alphabet: definitionParsed['Alphabet'],
+            startingState: definitionParsed['Starting State'],
+            finalStates: definitionParsed['Final States'],
+            transitionFunctions: definitionParsed['Transition Function']
+        });
     }
 
     /**
      * Due to the file given possibly not resembling any other test file (in terms of new lines)
      * I will take every element and put it into one line by tracking the brackets
      */
-    oneLineItems = (items : string[], i: number): any => {
+    oneLineItems = (items, i) => {
         var foundRightBracket = false;
         if(items[i].includes("}")) return [items[i].trim(), i++];
 
@@ -73,11 +91,11 @@ export default class Diagram extends React.Component{
         return [elementsOnOneLine, i];
     }
 
-    parseOneLineElement = (element: string): any => {
+    parseOneLineElement = (element) => {
         var key = element.slice(0, element.indexOf("=")).trim();
 
         if(key == "Transition Function"){
-            var transitionMappings:any = {};
+            var transitionMappings = {};
             var transitionFunctionsStr = element.slice(element.indexOf("("), element.lastIndexOf(")")+1);
             var transitionFunctionArr = [];
 
@@ -90,7 +108,7 @@ export default class Diagram extends React.Component{
                 }
             }
             transitionFunctionArr.forEach(i => {
-                var temp:any = {};
+                var temp = {};
                 temp[i[2]] = i[1];
                 if(transitionMappings.hasOwnProperty(i[0])){
                     transitionMappings[i[0]].push(temp);

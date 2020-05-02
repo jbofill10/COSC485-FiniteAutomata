@@ -1,16 +1,19 @@
 import React from 'react';
 
-export default class DFA extends React.Component{
-    constructor(props: any){
-        super(props);
-        this.state={
 
+export default class DFA extends React.Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            test: null
         };
     }
 
     render(){
         return(
-            <div>DFA Test</div>
+        <div>
+            No
+        </div>
         );
     }
 
