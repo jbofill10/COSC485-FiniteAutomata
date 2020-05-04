@@ -12,7 +12,8 @@ export default class Diagram extends React.Component{
             startingState: null,
             finalStates: null,
             transitionFunctions: null,
-            strings: null
+            strings: null,
+            NFA: null
         };
     }
 
@@ -23,11 +24,26 @@ export default class Diagram extends React.Component{
     }
 
     render(){
-        return(
-            <DFA states={this.state.states} alphabet={this.state.alphabet} startingState={this.state.startingState} 
-                finalStates={this.state.finalStates} transitionFunctions={this.state.transitionFunctions} strings={this.state.strings}
-            />
-        );
+        // Conditional Rendering for the different diagrams
+            if (this.state.NFA === null){
+                return(
+                    <div>Loading...</div>
+                )
+            }else if (this.state.NFA){
+                return (
+                    <NFA states={this.state.states} alphabet={this.state.alphabet} startingState={this.state.startingState} 
+                    finalStates={this.state.finalStates} transitionFunctions={this.state.transitionFunctions} strings={this.state.strings}
+                    />
+                );
+            }else{
+                console.log(this.state.NFA)
+                return(
+                    <DFA states={this.state.states} alphabet={this.state.alphabet} startingState={this.state.startingState} 
+                    finalStates={this.state.finalStates} transitionFunctions={this.state.transitionFunctions} strings={this.state.strings}
+                    />
+                );
+            
+        }
     }
 
     readFiles = (definitionPath, stringsPath) => {
@@ -63,7 +79,7 @@ export default class Diagram extends React.Component{
             alphabet: definitionParsed['Alphabet'],
             startingState: definitionParsed['Starting State'],
             finalStates: definitionParsed['Final States'],
-            transitionFunctions: definitionParsed['Transition Function']
+            transitionFunctions: definitionParsed['Transition']
         });
     }
 
@@ -94,7 +110,9 @@ export default class Diagram extends React.Component{
     parseOneLineElement = (element) => {
         var key = element.slice(0, element.indexOf("=")).trim();
 
-        if(key == "Transition Function"){
+        if(key.includes("Transition")){
+            key = key.split(" ")[0];
+            console.log(key)
             var transitionMappings = {};
             var transitionFunctionsStr = element.slice(element.indexOf("("), element.lastIndexOf(")")+1);
             var transitionFunctionArr = [];
@@ -117,6 +135,8 @@ export default class Diagram extends React.Component{
                 }
             });
 
+            this.determineFA(transitionMappings);
+            
             return [key, transitionMappings];
         }
         
@@ -125,6 +145,27 @@ export default class Diagram extends React.Component{
         values = values.map(i => i.trim());
 
         return [key, values];
+    }
+
+    determineFA = (transitionMappings) => {
+        var foundE = false;
+        for(var key of Object.keys(transitionMappings)){
+            for(var items of transitionMappings[key]){
+                var entry = Object.entries(items);
+                // If epsilon in transition, its an NFA
+                if (entry[0][1] === 'e'){
+                    foundE=true;
+                    console.log(entry[0][1])
+                    this.setState({NFA: true})
+                    
+                }
+
+            }
+        }
+        // If an e wasn't found, it's a DFA
+        
+        if (this.state.NFA === null && !foundE) this.setState({NFA: false})
+        
     }
 
     

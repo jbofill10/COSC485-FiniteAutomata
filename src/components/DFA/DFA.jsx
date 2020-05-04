@@ -1,5 +1,7 @@
 import React from 'react';
-import { Network, Node, Edge } from 'react-vis-network';
+import { Network } from 'react-vis-network';
+import { generateStates } from '../Diagram/States';
+import { generateTransitions } from '../Diagram/Transitions';
 import fs from "fs";
 import 'dotenv/config'
 
@@ -10,7 +12,12 @@ export default class DFA extends React.Component{
         this.state = {
             width: null,
             height: null,
-            networkList:null
+            states: null,
+            alphabet: null,
+            startingState: null,
+            finalStates: null,
+            transitionFunctions: null,
+            strings: null,
         };
     }
 
@@ -25,6 +32,23 @@ export default class DFA extends React.Component{
 
     componentDidUpdate(){
         this.computeStringsOnDFA();
+
+        if (this.props.states != this.state.states){
+            this.setState({states: this.props.states});
+        }
+        if (this.props.alphabet != this.state.alphabet){
+            this.setState({alphabet: this.props.alphabet});
+        }
+        if (this.props.startingState != this.state.startingState){
+            this.setState({startingState: this.props.startingState});
+        }
+        if (this.props.finalStates != this.state.finalStates){
+            this.setState({finalStates: this.props.finalStates});
+        }
+        if (this.props.transitionFunctions != this.state.transitionFunctions){
+            this.setState({transitionFunctions: this.props.transitionFunctions});
+        }
+    
     }
 
     updateWindowDimensions() {
@@ -56,29 +80,14 @@ export default class DFA extends React.Component{
             return(
                 <Network options={graphOptions}>
                     {/* Building States for Graph */}
-                    {this.props.states.map((state, index) => {
-                        if (this.props.startingState === state){
-                            return <Node key={index} id={state} label={state} color={'#75daad'}/>
-                        }else if(this.props.finalStates.includes(state)){
-                            return <Node key={index} id={state} label={state} color={'#f34573'}/>
-                        }else{
-                            return <Node key={index} id={state} label={state}/>
-                        }
-                    })}
+                    {generateStates(this.props.states, this.props.startingState, this.props.finalStates)}
                     
-                    {Object.entries(this.props.transitionFunctions).map(([k,v]) => {
+                    {generateTransitions(this.props.transitionFunctions)}
 
-                            return v.map((obj, index) => {
-
-                                var transitionState = Object.keys(obj)[0];
-                                var transitionVar = obj[Object.keys(obj)[0]];
-                                
-                                return <Edge key={index} id={k+"_to_"+transitionState} arrows='to' from={k} to={transitionState} label={transitionVar}/>
-                                
-                            })})}
                 </Network>
             )
         }else{
+            
             return(
                 <div>Loading...</div>
             )
