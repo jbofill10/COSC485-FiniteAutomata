@@ -18,7 +18,8 @@ export default class NFA extends React.Component{
             finalStates: null,
             transitionFunctions: null,
             strings: null,
-            ran: false
+            ran: false,
+            startColor: null
         };
     }
 
@@ -54,6 +55,8 @@ export default class NFA extends React.Component{
             this.props.startingState !== null 
             && this.props.finalStates !== null 
             && this.props.transitionFunctions && !this.state.ran){
+
+                this.setState({startColor:(this.props.finalStates.includes(this.props.startingState) ? '#af8baf' :'#75daad')})
                 
                 this.computeStringsOnNFA();
         }
@@ -87,6 +90,73 @@ export default class NFA extends React.Component{
         if(this.state.height !== null && this.state.width !== null && this.state.states !== null && this.state.startingState !== null && this.state.finalStates !== null && this.state.transitionFunctions){
             
             return(
+                <div className='AllStateContainers' style={{
+                    'paddingLeft': '5px'
+                }}>
+                    <div className='StartingStateContainer' style={{
+                        'display':'flex',
+                    }}>
+
+                    <div>Starting State:</div>
+                    <div className='StartingStateText' style={{
+                        'color': this.state.startColor,
+                    }}>&nbsp; {this.props.startingState}</div>
+
+                </div>
+
+
+                <div className='OtherStateContainer' style={{
+                        'display':'flex'
+                    }}>
+
+                    <div>Other States:</div>
+
+                    {this.props.states.map((state, index) => {
+                        if (this.state.finalStates.includes(state)) return;
+                    return(
+                        <div key={index} className='StartingStateText' style={{
+                            'color': '#8cacd0' 
+                            }}>&nbsp; {state} </div>
+
+                    )
+                        })}
+                    
+                    
+                    </div>
+
+
+                    <div className='FinalStateContainer' style={{
+                        'display':'flex'
+                    }}>
+
+                    <div>Final States:</div>
+
+                    {this.props.finalStates.map((state, index) => {
+                        if (this.state.startingState === state){
+                            return(
+                                <div key={index} className='StartingStateText' style={{
+                                    'color': this.state.startColor
+                                    }}>&nbsp; {state} </div>
+        
+                            )
+                        }
+                    return(
+                        <div key={index} className='FinalStateText' style={{
+                            'color': '#f34573' 
+                            }}>&nbsp; {state} </div>
+
+                    )
+                        })}
+                    
+                    </div>
+
+                    <button style={{
+                        marginTop: '5px',
+                        width: '90px'
+                    }} onClick={this.onClick}>
+                        Click if Diagram Looks Ugly
+                    </button>
+            
                 <Network options={graphOptions}>
                     {/* Building States for Graph */}
                     {generateStates(this.props.states, this.props.startingState, this.props.finalStates)}
@@ -94,6 +164,7 @@ export default class NFA extends React.Component{
                     {generateTransitions(this.props.transitionFunctions)}
 
                 </Network>
+                </div>
             );
         }else{
                 return(
@@ -113,7 +184,7 @@ export default class NFA extends React.Component{
         // If the string is accepted in the machine, it is set to true.
         strings.forEach(string => {
             string = string.trim()
-            console.log(string)
+
             stringAcceptance[string] = false;
         })
 
@@ -122,9 +193,6 @@ export default class NFA extends React.Component{
             // Used to track how far a string has progressed. At the end,
             // if the string is acceptable, the length should be 1. (Since for loop wouldn't continue)
             var stringLength = string.length-1;
-            
-            // Considering String could be extremely long, I'd rather access from
-            // an array vs. using charAt
             var stringArray = string.trim().split("");
 
             // Queue styled data structure to maintain what current states the machine is at
@@ -176,6 +244,7 @@ export default class NFA extends React.Component{
                             }
                             
                             if (this.props.finalStates.includes(state)){
+
                                 stringAcceptance[string] = true;
                             }
 
@@ -203,5 +272,9 @@ export default class NFA extends React.Component{
             fs.writeFileSync(String(process.env.REACT_APP_file3), output);
         }
     }
-    
+
+    onClick = () => {
+        window.location.reload()
+    }
+
 }

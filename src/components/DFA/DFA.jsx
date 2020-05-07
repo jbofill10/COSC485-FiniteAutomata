@@ -18,7 +18,8 @@ export default class DFA extends React.Component{
             finalStates: null,
             transitionFunctions: null,
             strings: null,
-            ran: false
+            ran: false,
+            startColor: null
         };
     }
 
@@ -55,7 +56,8 @@ export default class DFA extends React.Component{
             this.props.startingState !== null 
             && this.props.finalStates !== null 
             && this.props.transitionFunctions && !this.state.ran){
-                
+
+                this.setState({startColor:(this.props.finalStates.includes(this.props.startingState) ? '#af8baf' :'#75daad')})
                 this.computeStringsOnDFA();
         }
     
@@ -86,8 +88,77 @@ export default class DFA extends React.Component{
         }
     }
 
-        if(this.state.height !== null && this.state.width !== null && this.props.states !== null && this.props.startingState !== null && this.props.finalStates !== null && this.props.transitionFunctions){
+        if(this.state.height !== null && this.state.width !== null && this.state.states !== null && this.state.startingState !== null && this.state.finalStates !== null && this.state.transitionFunctions){
+
+
             return(
+                <div className='AllStateContainers' style={{
+                    'paddingLeft': '5px'
+                }}>
+                    <div className='StartingStateContainer' style={{
+                        'display':'flex',
+                    }}>
+
+                    <div>Starting State:</div>
+                    <div className='StartingStateText' style={{
+                        'color': this.state.startColor,
+                    }}>&nbsp; {this.props.startingState}</div>
+
+                </div>
+
+
+                <div className='OtherStateContainer' style={{
+                        'display':'flex'
+                    }}>
+
+                    <div>Other States:</div>
+
+                    {this.props.states.map((state, index) => {
+                        if (this.state.finalStates.includes(state)) return;
+                    return(
+                        <div key={index} className='StartingStateText' style={{
+                            'color': '#8cacd0' 
+                            }}>&nbsp; {state} </div>
+
+                    )
+                        })}
+                    
+                    
+                    </div>
+
+
+                    <div className='FinalStateContainer' style={{
+                        'display':'flex'
+                    }}>
+
+                    <div>Final States:</div>
+
+                    {this.props.finalStates.map((state, index) => {
+                        if (this.state.startingState === state){
+                            return(
+                                <div key={index} className='StartingStateText' style={{
+                                    'color': this.state.startColor
+                                    }}>&nbsp; {state} </div>
+        
+                            )
+                        }
+                    return(
+                        <div key={index} className='FinalStateText' style={{
+                            'color': '#f34573' 
+                            }}>&nbsp; {state} </div>
+
+                    )
+                        })}
+                    
+                    </div>
+
+                    <button style={{
+                        marginTop: '5px',
+                        width: '90px'
+                    }} onClick={this.onClick}>
+                        Click if Diagram Looks Ugly
+                    </button>
+            
                 <Network options={graphOptions}>
                     {/* Building States for Graph */}
                     {generateStates(this.props.states, this.props.startingState, this.props.finalStates)}
@@ -95,7 +166,8 @@ export default class DFA extends React.Component{
                     {generateTransitions(this.props.transitionFunctions)}
 
                 </Network>
-            )
+                </div>
+            );
         }else{
             
             return(
@@ -122,7 +194,7 @@ export default class DFA extends React.Component{
         var currentState = "";
 
         strings.forEach(string => {
-            
+            console.log(string)
             // Used to track how far a string has progressed. At the end,
             // if the string is acceptable, the length should be 1. (Since for loop wouldn't continue)
             var stringLength = string.length-1;
@@ -160,7 +232,25 @@ export default class DFA extends React.Component{
                     return;
                 }
             }
-        })
+        });
+        console.log(stringAcceptance)
+        var output = "";
+        for(var entry of Object.entries(stringAcceptance)){
+                
+            if(entry[1]){
+                output += `${entry[0].trim()} is accepted.\n\n`;
+
+            }else{
+                output +=`${entry[0].trim()} is rejected.\n\n`;
+            }
+            
+            fs.writeFileSync(String(process.env.REACT_APP_file3), output, {flag: 'w'});
+        }
+
+    }
+
+    onClick = () => {
+        window.location.reload()
     }
 
 

@@ -5,7 +5,8 @@ import {Node} from 'react-vis-network';
         return(
             states.map((state, index) => {
                 if (startingState === state){
-                    return <Node key={index} id={state} label={state} color={'#75daad'}/>
+                    console.log(finalStates, state)
+                    return <Node key={index} id={state} label={state} color={finalStates.includes(state) ? '#af8baf' :'#75daad'}/>
                 }else if(finalStates.includes(state)){
                     return <Node key={index} id={state} label={state} color={'#f34573'}/>
                 }else{
