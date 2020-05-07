@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Diagram } from './components/index'
+import Diagram from './views/Diagram'
 
 function App() {
         return(

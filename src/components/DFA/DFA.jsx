@@ -18,6 +18,7 @@ export default class DFA extends React.Component{
             finalStates: null,
             transitionFunctions: null,
             strings: null,
+            ran: false
         };
     }
 
@@ -31,22 +32,31 @@ export default class DFA extends React.Component{
     }
 
     componentDidUpdate(){
-        this.computeStringsOnDFA();
+        
 
-        if (this.props.states != this.state.states){
+        if (this.props.states !== this.state.states){
             this.setState({states: this.props.states});
         }
-        if (this.props.alphabet != this.state.alphabet){
+        if (this.props.alphabet !== this.state.alphabet){
             this.setState({alphabet: this.props.alphabet});
         }
-        if (this.props.startingState != this.state.startingState){
+        if (this.props.startingState !== this.state.startingState){
             this.setState({startingState: this.props.startingState});
         }
-        if (this.props.finalStates != this.state.finalStates){
+        if (this.props.finalStates !== this.state.finalStates){
             this.setState({finalStates: this.props.finalStates});
         }
-        if (this.props.transitionFunctions != this.state.transitionFunctions){
+        if (this.props.transitionFunctions !== this.state.transitionFunctions){
             this.setState({transitionFunctions: this.props.transitionFunctions});
+        }
+        if(this.state.height !== null && 
+            this.state.width !== null && 
+            this.props.states !== null && 
+            this.props.startingState !== null 
+            && this.props.finalStates !== null 
+            && this.props.transitionFunctions && !this.state.ran){
+                
+                this.computeStringsOnDFA();
         }
     
     }
@@ -76,7 +86,7 @@ export default class DFA extends React.Component{
         }
     }
 
-        if(this.state.height != null && this.state.width != null && this.props.states != null && this.props.startingState != null && this.props.finalStates != null && this.props.transitionFunctions){
+        if(this.state.height !== null && this.state.width !== null && this.props.states !== null && this.props.startingState !== null && this.props.finalStates !== null && this.props.transitionFunctions){
             return(
                 <Network options={graphOptions}>
                     {/* Building States for Graph */}
@@ -95,6 +105,9 @@ export default class DFA extends React.Component{
     }
 
     computeStringsOnDFA = () => {
+        
+        this.setState({ran:true})
+
         var strings = fs.readFileSync(String(process.env.REACT_APP_file2)).toString("utf-8").split("\n").filter(e => e.length > 1);
 
         // String hashmap to contain whether its true or false
@@ -148,9 +161,6 @@ export default class DFA extends React.Component{
                 }
             }
         })
-
-        console.log(stringAcceptance);
-
     }
 
 
