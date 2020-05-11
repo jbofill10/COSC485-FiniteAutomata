@@ -5,6 +5,7 @@
   "private": true,
   "main": "public/electron.js",
   "dependencies": {
+    "cross-env": "^7.0.2",
     "dotenv": "^8.2.0",
     "electron-is-dev": "^1.2.0",
     "react": "^16.13.1",
@@ -37,7 +38,7 @@
     "dist": "electron-builder",
     "electron-pack": "build -c.extraMetadata.main=build/electron.js",
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-	"electron-dev-windows": "concurrently \"set BROWSER=NONE yarn start\" \"wait-on http://localhost:3000 && electron .\""
+    "electron-dev-windows": "concurrently \"cross-env BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\""
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -60,7 +61,7 @@
     "concurrently": "^5.2.0",
     "electron": "^8.2.5",
     "electron-builder": "^22.6.0",
-    "wait-on": "^4.0.2"
+    "wait-on": "^5.0.0"
   },
   "homepage": "./"
 }
