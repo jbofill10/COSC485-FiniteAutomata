@@ -18,7 +18,7 @@ export default class Diagram extends React.Component{
     }
 
     componentDidMount(){
-        console.log(process.env.REACT_APP_file1)
+        
         this.readFiles(String(process.env.REACT_APP_file1).trim() || "", 'utf8', "placefiller");
         
     }
@@ -36,7 +36,7 @@ export default class Diagram extends React.Component{
                     />
                 );
             }else{
-                console.log(this.state.NFA)
+                
                 return(
                     <DFA states={this.state.states} alphabet={this.state.alphabet} startingState={this.state.startingState} 
                     finalStates={this.state.finalStates} transitionFunctions={this.state.transitionFunctions} strings={this.state.strings}
@@ -48,7 +48,7 @@ export default class Diagram extends React.Component{
 
     readFiles = (definitionPath, stringsPath) => {
         // Reading Automata Definition file:
-        console.log(definitionPath)
+        
         var definitionParsed = {};
         var defText = fs.readFileSync(definitionPath).toString("utf-8");
 
@@ -112,7 +112,6 @@ export default class Diagram extends React.Component{
 
         if(key.includes("Transition")){
             key = key.split(" ")[0];
-            console.log(key)
             var transitionMappings = {};
             var transitionFunctionsStr = element.slice(element.indexOf("("), element.lastIndexOf(")")+1);
             var transitionFunctionArr = [];

@@ -19,7 +19,8 @@ export default class NFA extends React.Component{
             transitionFunctions: null,
             strings: null,
             ran: false,
-            startColor: null
+            startColor: null,
+            optimizedTransitions: null
         };
     }
 
@@ -49,16 +50,17 @@ export default class NFA extends React.Component{
             this.setState({transitionFunctions: this.props.transitionFunctions});
         }
 
-        if(this.state.height !== null && 
-            this.state.width !== null && 
-            this.props.states !== null && 
-            this.props.startingState !== null 
-            && this.props.finalStates !== null 
-            && this.props.transitionFunctions && !this.state.ran){
+        if(this.state.height !== undefined && 
+            this.state.width !== undefined && 
+            this.props.states !== undefined && 
+            this.props.startingState !== undefined 
+            && this.props.finalStates !== undefined 
+            && this.props.transitionFunctions !== undefined && !this.state.ran){
 
                 this.setState({startColor:(this.props.finalStates.includes(this.props.startingState) ? '#af8baf' :'#75daad')})
                 
                 this.computeStringsOnNFA();
+                this.optimizeTransitions();
         }
     }
 
@@ -87,12 +89,20 @@ export default class NFA extends React.Component{
             }
         }
 
-        if(this.state.height !== null && this.state.width !== null && this.state.states !== null && this.state.startingState !== null && this.state.finalStates !== null && this.state.transitionFunctions){
+        if(this.state.height !== null && this.state.width !== null && this.state.states !== null && this.state.startingState !== null 
+            && this.state.finalStates !== null && this.state.transitionFunctions && this.state.optimizedTransitions !== null){
             
             return(
                 <div className='AllStateContainers' style={{
                     'paddingLeft': '5px'
                 }}>
+                    <div className='Type' style={{
+                        'color': '#494368',
+                        'fontSize': '20px'
+                    }}>
+                        NFA
+                    </div>
+
                     <div className='StartingStateContainer' style={{
                         'display':'flex',
                     }}>
@@ -161,7 +171,7 @@ export default class NFA extends React.Component{
                     {/* Building States for Graph */}
                     {generateStates(this.props.states, this.props.startingState, this.props.finalStates)}
                     
-                    {generateTransitions(this.props.transitionFunctions)}
+                    {generateTransitions(this.state.optimizedTransitions)}
 
                 </Network>
                 </div>
@@ -275,6 +285,65 @@ export default class NFA extends React.Component{
 
     onClick = () => {
         window.location.reload()
+    }
+
+    /**
+        * Due to the graph library not supporting several self-referencing loops
+        * I made a custom function to pair these self referencing transitions
+        * to be under the same string. i.e a,b instead of two transitions a and b
+     */
+    optimizeTransitions = () => {
+        
+        var optimizedTransitions = {}
+
+        Object.entries(this.props.transitionFunctions).map(([k,v]) => {
+            
+            var transitions = [];
+
+            for(var transition of v){
+                
+                var entry = Object.entries(transition);
+                var transitionState = entry[0][0];
+                var transitionChar = entry[0][1];
+                              
+                if (transitions.length < 1){
+                    console.log(transitionChar)
+                    transitions.push({[transitionState]:transitionChar})
+                    continue;
+                }else{
+
+                    for(var i = 0; i<transitions.length; i++){
+                    
+                        var transitionEntry = Object.entries(transitions[i]);
+                        var entryTransitionState = transitionEntry[0][0];
+                        var entryTransitionChar = transitionEntry[0][1];
+                        
+                        
+                        if(k=== transitionState && transitionState === entryTransitionState){
+
+                            transitions.pop()
+
+                            entryTransitionChar+="," + transitionChar
+                            
+                            transitions.push({[transitionState]:entryTransitionChar})
+                            break;
+
+                        }else{
+                            transitions.push({[transitionState]:transitionChar})
+                            break;
+                        }
+                    }
+                    
+                }
+                
+            }
+            
+            optimizedTransitions[k] = transitions;
+            
+
+        });
+        
+        this.setState({optimizedTransitions : optimizedTransitions})
     }
 
 }

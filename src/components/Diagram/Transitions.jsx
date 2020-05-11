@@ -2,6 +2,7 @@ import React from 'react';
 import {Edge} from 'react-vis-network';
 
 export function generateTransitions(transitionFunctions){
+
     return(
         Object.entries(transitionFunctions).map(([k,v]) => {
 
