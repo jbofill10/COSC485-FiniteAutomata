@@ -46,7 +46,7 @@ export default class Diagram extends React.Component{
         }
     }
 
-    readFiles = (definitionPath, stringsPath) => {
+    readFiles = (definitionPath) => {
         // Reading Automata Definition file:
         
         var definitionParsed = {};
@@ -106,7 +106,9 @@ export default class Diagram extends React.Component{
 
         return [elementsOnOneLine, i];
     }
-
+    /**
+     * I convert all definitions to one line (M has it's own line, etc.) and then parse it that way
+     */
     parseOneLineElement = (element) => {
         var key = element.slice(0, element.indexOf("=")).trim();
 

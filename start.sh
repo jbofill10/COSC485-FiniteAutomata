@@ -1,5 +1,7 @@
 #!/bin/sh
 
+yarn
+
 /bin/cat <<EOM >.env
 REACT_APP_file1=$1
 REACT_APP_file2=$2

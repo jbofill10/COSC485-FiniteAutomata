@@ -23,16 +23,16 @@ export default class NFA extends React.Component{
             optimizedTransitions: null
         };
     }
-
+    // Calls functions to scale HTML canvas to window size when the component is loaded
     componentDidMount() {
         this.updateWindowDimensions();
         window.addEventListener("resize", this.updateWindowDimensions.bind(this));
     }
-
+    // Same as componentDidMount(), but when the component unmounts
     componentWillUnmount() {
         window.removeEventListener("resize", this.updateWindowDimensions.bind(this));
     }
-
+    // If information in the props of other components changes, it re-renders the component 
     componentDidUpdate(){
         if (this.props.states !== this.state.states){
             this.setState({states: this.props.states});
@@ -182,7 +182,9 @@ export default class NFA extends React.Component{
                 );
             }
     }
-
+    /**
+     * Runs strings through NFA model to see if they're accepted
+     */
     computeStringsOnNFA = () => {
         this.setState({ran:true})
         var strings = fs.readFileSync(String(process.env.REACT_APP_file2)).toString("utf-8").split("\n").filter(e => e.length > 1);
@@ -193,6 +195,7 @@ export default class NFA extends React.Component{
         // Set all strings in the hashmap with a value that is false
         // If the string is accepted in the machine, it is set to true.
         strings.forEach(string => {
+            
             string = string.trim()
 
             stringAcceptance[string] = false;
@@ -200,17 +203,13 @@ export default class NFA extends React.Component{
 
         strings.forEach(string => {
             string = string.trim();
-            // Used to track how far a string has progressed. At the end,
-            // if the string is acceptable, the length should be 1. (Since for loop wouldn't continue)
-            var stringLength = string.length-1;
-            var stringArray = string.trim().split("");
 
             // Queue styled data structure to maintain what current states the machine is at
-            var currentStates  = [{[this.props.startingState]: 'e'}];
+            // The transitionChar is just a place filler 
+            var currentStates  = [{state: this.props.startingState, transitionChar: 'e', string: string}];
             
-            for (var i = 0; i < stringArray.length; i++){
+            while(currentStates.length > 0){
 
-                var currentChar = stringArray[i];
                 // Every time we exhaust the queue (currentStates), we are keeping track of the new
                 // transitions that can be checked and is added
                 // into the previous queue after exhausted 
@@ -218,10 +217,13 @@ export default class NFA extends React.Component{
                 
                 for(var stateEntry of currentStates){
 
-                    var currentState = Object.entries(stateEntry)[0][0];
+                    var currentChar = stateEntry['string'].slice(0,1)
+                    var currentString = stateEntry['string']
+                    
+                    var currentState = stateEntry['state']
 
                     currentStates.shift();
-                    
+
                     // Does current state contain a transition? If not, next character
                     if (this.props.transitionFunctions.hasOwnProperty(currentState)){
                         this.props.transitionFunctions[currentState].forEach(transition => {
@@ -231,40 +233,42 @@ export default class NFA extends React.Component{
                             var transitionState = Object.entries(transition)[0][0];
                             var transitionChar = Object.entries(transition)[0][1];
                             
-                            
                             // If transition function uses current character
-                            if (transitionChar === currentChar || transitionChar === 'e'){
+                            if (transitionChar === currentChar){
                                
-                                transitionsFound.push({[transitionState]: transitionChar});
-                                
-                            }  
-                        })
-                    }
+                                transitionsFound.push({
+                                    state: transitionState, 
+                                    transitionChar: transitionChar, 
+                                    string: currentString.slice(1)
+                                });
 
+                            // If the transition is epsilon, then we don't use a character 
+                            }else if(transitionChar === 'e'){
+                                transitionsFound.push({
+                                    state: transitionState, 
+                                    transitionChar: transitionChar, 
+                                    string: currentString
+                                });
+                            }  
+                        });
+                    }
                 }
 
-                currentStates = JSON.parse(JSON.stringify(transitionsFound));
+                // The next possible transitions to example are put in the currentStates queue
+                // After we have iterated through the currentStates array
+                transitionsFound.forEach(element => {
+                    currentStates.push(element)
+                })
 
-                    if(i === stringArray.length-1){
-                        for(var pairing of currentStates){
-                            var state = null;
-
-                            for(var entry of Object.entries(pairing)){
-                                state = entry[0];
-                            }
+                    if (stateEntry['string'] === ""){
                             
-                            if (this.props.finalStates.includes(state)){
+                            if (this.props.finalStates.includes(stateEntry['state'])){
 
                                 stringAcceptance[string] = true;
-                            }
-
-                        }
-                        
+                            }                        
                     }
 
                 }
-                
-
         });
 
         // Output to file
@@ -307,7 +311,7 @@ export default class NFA extends React.Component{
                 var transitionChar = entry[0][1];
                               
                 if (transitions.length < 1){
-                    console.log(transitionChar)
+                    
                     transitions.push({[transitionState]:transitionChar})
                     continue;
                 }else{

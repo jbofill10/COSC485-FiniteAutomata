@@ -23,16 +23,16 @@ export default class DFA extends React.Component{
             optimizedTransitions: null
         };
     }
-
+    // Calls functions to scale HTML canvas to window size when the component is loaded
     componentDidMount() {
         this.updateWindowDimensions();
         window.addEventListener("resize", this.updateWindowDimensions.bind(this));
     }
-
+    // Same as componentDidMount(), but when the component unmounts
     componentWillUnmount() {
         window.removeEventListener("resize", this.updateWindowDimensions.bind(this));
     }
-
+    // If information in the props of other components changes, it re-renders the component 
     componentDidUpdate(){
         
 
@@ -190,7 +190,9 @@ export default class DFA extends React.Component{
             )
         }
     }
-
+    /**
+     * Runs strings through DFA model to see if they're accepted
+     */
     computeStringsOnDFA = () => {
         
         this.setState({ran:true})
