@@ -44,3 +44,12 @@ Lastly, add in another variable called REACT_APP_file3 that contains a path to c
 
 ### Run Dev Mode
 Once that is finished, all that is needed to do is type `yarn electron-dev`
+
+
+# Examples
+
+## DFA
+![image](DFAExample.png)
+
+## NFA
+![image](NFAExample.png)
