@@ -45,6 +45,18 @@ Lastly, add in another variable called REACT_APP_file3 that contains a path to c
 ### Run Dev Mode
 Once that is finished, all that is needed to do is type `yarn electron-dev`
 
+### Run Project with Commandline args
+This writes the file paths to the .env file and installs yarn dependencies
+
+#### For Windows
+
+start.bat `{FA Definition File Path}` `{Strings file Path}` `{Results Output File Path}`
+
+#### For Mac / Linux
+
+bash start.sh `{FA Definition File Path}` `{Strings file Path}` `{Results Output File Path}`
+
+
 # Examples
 
 ## DFA
