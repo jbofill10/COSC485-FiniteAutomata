@@ -30,18 +30,6 @@ Transition Function = {
 ```
 The actual spacing of the lines doesn't matter.
 
-In project root, create a .env file.
-
-Then create a variable REACT_APP_file1 that contains the file path.
-
-Another feature of this application is that it allows you to input a file of strings and will return whether or not those strings are accepted by the machine or not.
-
-The process is the same as before, create a variable REACT_APP_file2 that contains the file path.
-
-Lastly, add in another variable called REACT_APP_file3 that contains a path to create a file where it tells you whether the strings from file2 were accepted by the machine or not.
-
-(I plan to automate this with a script soon)
-
 ### Run Dev Mode
 Once that is finished, all that is needed to do is type `yarn electron-dev`
 
